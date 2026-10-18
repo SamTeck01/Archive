@@ -49,10 +49,10 @@ export const photography = [
 export const photoStrip = [1, 2, 3, 4, 5].map((n) => img(`strip-${n}`))
 
 export const music = [
-  { era: '1950s–1960s', title: 'Taxi Driver', artist: 'Bobby Benson', key: '5060' },
-  { era: '1970s', title: 'Water No Get Enemy', artist: 'Fela Kuti', key: '70s' },
-  { era: '1980s–1990s', title: 'Juju Music', artist: 'King Sunny Adé', key: '8090' },
-  { era: '2000s', title: 'African Queen', artist: '2Face Idibia (2Baba)', key: '2000s' },
+  { era: '1950s–1960s', title: 'Taxi Driver', artist: 'Bobby Benson', key: '5060', search: 'Bobby Benson Taxi Driver' },
+  { era: '1970s', title: 'Water No Get Enemy', artist: 'Fela Kuti', key: '70s', search: 'Fela Kuti Water No Get Enemy' },
+  { era: '1980s–1990s', title: 'Juju Music', artist: 'King Sunny Adé', key: '8090', search: 'King Sunny Ade Ja Funmi', artistMatch: 'Sunny' },
+  { era: '2000s', title: 'African Queen', artist: '2Face Idibia (2Baba)', key: '2000s', search: '2face Idibia African Queen', artistMatch: '2face' },
 ].map((m) => ({
   ...m,
   cover: img(`music-${m.key}-cover`),

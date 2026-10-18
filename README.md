@@ -14,4 +14,5 @@ Pages: home (`#/`) and 10 detail pages, e.g. `#/fashion/aso-oke`, `#/design/fest
 - Save pieces to "Your collection" (heart button); kept in the browser's local storage.
 - Museum guide on every detail page: answers questions offline from the archive's own texts (`src/guide.js`).
 - About, Mission, Contribute and Contact pages, with validated forms. There is no backend yet, so submissions are stored in local storage.
+- Music: tap a record to play a 30-second preview, looked up live from the public iTunes Search API (`src/hooks/usePlayer.js`). No audio is hosted in the repo.
 - Motion: hero parallax and staggered intro, masked text reveals, Ken Burns banners, scroll reveals, a looping photo strip, spinning records, 3D tilt cards, a cursor bubble, a lightbox, toasts, page transitions, a scroll progress bar and back-to-top. All of it respects `prefers-reduced-motion`.

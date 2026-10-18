@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   bannerSubtitle,
@@ -14,7 +14,9 @@ import {
   vinyl,
 } from '../data'
 import { ArrowUpRight, ClippedPhoto, Tape, TornEdge } from '../components/ui'
-import { MaskLines, SaveButton, Tilt, useLightbox } from '../components/extras'
+import { SaveButton, Tilt, useLightbox } from '../components/extras'
+import { toggleTrack, useTrack } from '../hooks/usePlayer'
+import { useSaved } from '../hooks/useSaved'
 
 const SAND = '#f2ebdd'
 
@@ -181,6 +183,7 @@ function Music() {
             <Record key={m.era} m={m} />
           ))}
         </div>
+        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-wider text-muted">Tap a record to play a preview · Previews courtesy of Apple Music</p>
         <div className="mt-[49px] px-[26px] md:mt-20">
           <h2 className="sr-only">Music and heritage</h2>
           <Heading
@@ -202,7 +205,12 @@ function Music() {
 }
 
 function Record({ m }) {
-  const [playing, setPlaying] = useState(false)
+  const track = useTrack(m.key)
+  const { notify } = useSaved()
+  const playing = track.state === 'playing'
+  const loading = track.state === 'loading'
+  const play = () =>
+    toggleTrack(m, () => notify(`Couldn’t load a preview of ${m.title} right now`))
   return (
     <article id={`music-${m.key}`} className="reveal relative scroll-mt-24">
       <p className="px-[26px] font-mono text-xs leading-4 text-ink/80">{m.era}</p>
@@ -211,31 +219,58 @@ function Record({ m }) {
         <button
           type="button"
           aria-pressed={playing}
-          aria-label={`${playing ? 'Stop' : 'Spin'} ${m.title} by ${m.artist}`}
-          onClick={() => setPlaying((p) => !p)}
-          className="group relative h-[163px] w-[230px] shrink-0 cursor-pointer"
+          aria-label={`${playing ? 'Pause' : 'Play'} a preview of ${m.title} by ${m.artist}`}
+          onClick={play}
+          data-cursor={playing ? 'Pause' : 'Play'}
+          className="group relative h-[163px] w-[230px] shrink-0"
         >
           <img
             src={vinyl}
             alt=""
-            className={`vinyl-spin absolute right-0 top-0 h-[163px] w-[163px] transition-transform duration-500 ${playing ? 'is-playing' : ''}`}
+            className={`vinyl-spin absolute right-0 top-0 h-[163px] w-[163px] ${playing ? 'is-playing' : ''}`}
             style={{ translate: playing ? '28px 0' : '0 0', transition: 'translate .5s cubic-bezier(.2,.7,.2,1)' }}
           />
-          <img
-            src={m.cover}
-            alt={`${m.title} by ${m.artist}, album cover`}
-            loading="lazy"
-            className={`relative h-[163px] w-[163px] rounded-l-[9px] object-cover shadow-album transition-transform duration-500 ${playing ? '-translate-x-4 -rotate-2' : 'group-hover:-translate-x-2'}`}
-          />
+          <span className="relative block h-[163px] w-[163px]">
+            <img
+              src={m.cover}
+              alt={`${m.title} by ${m.artist}, album cover`}
+              loading="lazy"
+              className={`h-full w-full rounded-l-[9px] object-cover shadow-album transition-transform duration-500 ${playing ? '-translate-x-4 -rotate-2' : 'group-hover:-translate-x-2'}`}
+            />
+            <span
+              className={`absolute inset-0 grid place-items-center transition-opacity duration-300 ${playing || loading ? 'opacity-0' : 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'}`}
+            >
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-white/90 shadow-lg">
+                <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+              </span>
+            </span>
+            {loading && (
+              <span className="absolute inset-0 grid place-items-center">
+                <span className="h-10 w-10 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              </span>
+            )}
+          </span>
         </button>
         <img src={m.right} alt="" loading="lazy" className="h-[120px] w-[120px] shrink-0 rounded-l-[6.5px] object-cover shadow-album transition hover:-translate-y-1" />
       </div>
       <div className="mt-[19px] text-center">
         <h3 className="font-display text-base font-medium leading-[19px]">{m.title}</h3>
         <p className="mt-1 text-sm leading-[18px] text-ink/80">{m.artist}</p>
-        <p className={`mt-1 h-4 font-mono text-[10px] uppercase tracking-widest text-amber transition-opacity ${playing ? 'opacity-100' : 'opacity-0'}`}>
-          ● Now spinning
-        </p>
+        <div className={`mx-auto mt-2 flex h-5 w-[180px] items-center gap-2 transition-opacity ${playing ? 'opacity-100' : 'opacity-0'}`} aria-hidden={!playing}>
+          <span className="flex h-3 items-end gap-[2px]">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="eq-bar w-[3px] rounded-sm bg-amber" style={{ animationDelay: `${i * 0.15}s` }} />
+            ))}
+          </span>
+          <span className="h-[2px] flex-1 overflow-hidden rounded bg-ink/10">
+            <span className="block h-full origin-left bg-amber" style={{ transform: `scaleX(${track.progress})` }} />
+          </span>
+          {track.info?.link && (
+            <a href={track.info.link} target="_blank" rel="noreferrer" className="font-mono text-[9px] uppercase text-muted hover:text-ink" tabIndex={playing ? 0 : -1}>
+              Apple Music
+            </a>
+          )}
+        </div>
       </div>
     </article>
   )
