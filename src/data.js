@@ -49,10 +49,10 @@ export const photography = [
 export const photoStrip = [1, 2, 3, 4, 5].map((n) => img(`strip-${n}`))
 
 export const music = [
-  { era: '1950s–1960s', title: 'Taxi Driver', artist: 'Bobby Benson', key: '5060' },
-  { era: '1970s', title: 'Water No Get Enemy', artist: 'Fela Kuti', key: '70s' },
-  { era: '1980s–1990s', title: 'Juju Music', artist: 'King Sunny Adé', key: '8090' },
-  { era: '2000s', title: 'African Queen', artist: '2Face Idibia (2Baba)', key: '2000s' },
+  { era: '1950s–1960s', title: 'Taxi Driver', artist: 'Bobby Benson', key: '5060', search: 'Bobby Benson Taxi Driver' },
+  { era: '1970s', title: 'Water No Get Enemy', artist: 'Fela Kuti', key: '70s', search: 'Fela Kuti Water No Get Enemy' },
+  { era: '1980s–1990s', title: 'Juju Music', artist: 'King Sunny Adé', key: '8090', search: 'King Sunny Ade Ja Funmi', artistMatch: 'Sunny' },
+  { era: '2000s', title: 'African Queen', artist: '2Face Idibia (2Baba)', key: '2000s', search: '2face Idibia African Queen', artistMatch: '2face' },
 ].map((m) => ({
   ...m,
   cover: img(`music-${m.key}-cover`),
@@ -112,7 +112,12 @@ export const footer = {
   tagline: 'Our culture. Our stories. Our legacy.',
   blurb:
     'A digital home for Nigerian creative heritage. Discover the photographs, sounds, styles, and designs that connect generations and preserve our stories for the future.',
-  about: ['Our Mission', 'About the Archive', 'Contribute', 'Contact Us'],
+  about: [
+    { label: 'Our Mission', to: '/info/mission' },
+    { label: 'About the Archive', to: '/info/about' },
+    { label: 'Contribute', to: '/info/contribute' },
+    { label: 'Contact Us', to: '/info/contact' },
+  ],
 }
 
 // Detail pages ("Fashion details", "Design details", "Photography details" frames).
@@ -233,5 +238,68 @@ export const details = {
     image: { src: img('detail-behind-the-lens'), alt: 'Two people looking at a camera', ratio: '1 / 1' },
     listLabel: 'Who they are:',
     list: ['J. A. Green: Bonny, 1873 to 1905', 'S. O. Alonge: Benin City court', 'Sunmi Smart-Cole: Lagos photojournalist'],
+  },
+}
+
+// Everything that can be found with search.
+export const searchIndex = [
+  ...Object.entries(details).map(([slug, d]) => ({
+    key: slug,
+    title: d.title,
+    category: d.category,
+    subtitle: d.meta.filter(Boolean).join(' · '),
+    text: [...d.body, d.after, ...(d.list || [])].filter(Boolean).join(' '),
+    image: d.thumb || d.image.src,
+    to: `/${d.category}/${slug}`,
+  })),
+  ...designColumns.flat().filter((d) => !d.slug).map((d) => ({
+    key: d.title,
+    title: d.title,
+    category: 'design',
+    subtitle: `${d.tag} · ${d.year}`,
+    text: d.tag,
+    image: d.image,
+    to: '/#design',
+  })),
+  ...music.map((m) => ({
+    key: m.title,
+    title: m.title,
+    category: 'music',
+    subtitle: `${m.artist} · ${m.era}`,
+    text: m.artist,
+    image: m.cover,
+    to: `/#music-${m.key}`,
+  })),
+]
+
+export const infoPages = {
+  mission: {
+    title: 'Our Mission',
+    lead: 'To keep Nigeria’s creative memory open, accurate and easy to explore.',
+    sections: [
+      ['Preserve', 'We gather photographs, recordings, cloth and printed design that tell the story of everyday creativity in Nigeria, and keep them in a form that will outlast the originals.'],
+      ['Explain', 'Every piece comes with plain-language context: who made it, when, and what to look for, so that a first-time visitor and a researcher both leave knowing more.'],
+      ['Share', 'The archive is free to browse. We credit makers and lenders, and we welcome corrections from the communities the work comes from.'],
+    ],
+  },
+  about: {
+    title: 'About the Archive',
+    lead: 'A digital home for Nigerian creative heritage, organised in four collections.',
+    sections: [
+      ['Photography', 'Studio portraits, street scenes and the photographers who recorded them, from the 1880s to the present.'],
+      ['Music', 'Records and artists across the decades, from 1950s highlife to 2000s pop.'],
+      ['Fashion', 'Aṣọ òkè, adire and akwete: the woven and dyed cloths that dress ceremonies and daily life.'],
+      ['Design', 'Posters, book covers, magazines and packaging that shaped how Nigeria looked and read.'],
+    ],
+  },
+  contribute: {
+    title: 'Contribute',
+    lead: 'Have a photograph, record, cloth or printed piece with a story? Tell us about it.',
+    form: 'contribute',
+  },
+  contact: {
+    title: 'Contact Us',
+    lead: 'Questions, corrections or partnership ideas. We read every message.',
+    form: 'contact',
   },
 }
